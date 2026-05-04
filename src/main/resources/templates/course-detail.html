@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Detail - Skillo Learn</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .video-section { background: #000; display: flex; justify-content: center; }
+        .video-wrap { width: 100%; max-width: 900px; aspect-ratio: 16/9; }
+        .video-wrap iframe { width: 100%; height: 100%; border: none; }
+        .detail-layout { display: grid; grid-template-columns: 1fr 340px; gap: 28px; max-width: 1100px; margin: 0 auto; padding: 40px; }
+        .prog-bar-bg { background: #eee; height: 10px; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .prog-bar-fill { background: #f5a623; height: 100%; width: 0%; transition: 0.3s; }
+        .lesson-done { background: #f0fdf4 !important; border-color: #86efac !important; }
+        .cat-badge { background: #0d1b35; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-right: 10px; }
+    </style>
+</head>
+<body style="background-color: #f8fafc;">
+
+<nav class="navbar">
+    <a href="/my-courses" style="color:white; text-decoration:none; margin-left:20px; font-weight: bold;">← My Dashboard</a>
+</nav>
+
+<div class="video-section">
+    <div class="video-wrap">
+        <!-- Video source loaded via app.js -->
+        <iframe id="course-video" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+</div>
+
+<div class="detail-layout">
+    <div class="detail-main">
+        <!-- Badge and Duration Placeholders for app.js -->
+        <div style="margin-bottom: 15px; display: flex; align-items: center;">
+            <span id="detail-category" class="cat-badge">Category</span>
+            <span id="detail-duration" style="color: #64748b; font-size: 14px; font-weight: 600;">⏱ Duration</span>
+        </div>
+
+        <h1 id="detail-title" style="margin-bottom: 25px; color: #1e293b;">Loading...</h1>
+
+        <div class="prog-card" style="background:white; padding:25px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-weight: 600; color: #475569;">Course Completion</span>
+                <span id="detail-pct" style="font-weight:bold; color: #f5a623; font-size: 18px;">0%</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="detail-bar"></div></div>
+        </div>
+
+        <h3 style="margin-bottom: 20px; color: #1e293b;">Curriculum Content</h3>
+        <!-- Lessons container filled dynamically by app.js -->
+        <div id="lessons-container"></div>
+    </div>
+
+    <div class="detail-sidebar">
+        <div class="sidebar-card" style="background:white; padding:25px; border-radius:16px; border:1px solid #e2e8f0; text-align:center; position: sticky; top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #1e293b;">Quick Progress</h4>
+            <div style="font-size:48px; font-weight:800; color:#f5a623; margin-bottom: 5px;" id="sidebar-pct">0%</div>
+            <div style="color:#64748b; font-size:14px; margin-bottom:15px; font-weight: 500;" id="sidebar-info">Ready to start?</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="sidebar-bar"></div></div>
+            
+            <a href="/my-courses" style="display:block; margin-top:20px; padding:12px; text-decoration:none; background:#f5a623; color:#0d1b35; border-radius:8px; font-weight: 800; font-size: 14px;">Return to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/app.js}"></script>
+<script>
+    // Logic to sync the sidebar UI with the core app.js updateProgress function
+    const _origUpdate = updateProgress;
+    window.updateProgress = function(checkbox, lessonIndex) {
+        _origUpdate(checkbox, lessonIndex); // Call original persistence logic
+        
+        const checkboxes = document.querySelectorAll('.lesson-check');
+        let completed = 0;
+        checkboxes.forEach(cb => { if (cb.checked) completed++; });
+        const pct = Math.round((completed / checkboxes.length) * 100);
+
+        // Update Sidebar Visuals
+        document.getElementById('sidebar-pct').textContent = pct + '%';
+        document.getElementById('sidebar-bar').style.width = pct + '%';
+        document.getElementById('sidebar-info').textContent = pct === 100 ? '🎉 Course Completed!' : 'Keep pushing forward!';
+    };
+</script>
+</body>
+</html>

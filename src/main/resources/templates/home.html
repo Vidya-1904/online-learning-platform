@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Skillo Learn - Elevate Your Edge</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/" class="brand">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="brand-text">
+            <div class="brand-name">SKILLO <span>LEARN</span></div>
+            <span class="brand-tag">ELEVATE YOUR EDGE</span>
+        </div>
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/courses">Courses</a>
+        <a href="/my-courses">My Courses</a>
+        <a href="/certificate">Certificates</a>
+        <a href="/admin">Admin</a>
+    </div>
+    <a href="/login" class="nav-cta">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+    <div class="hero-inner">
+        <div class="hero-badge"><div class="dot"></div>ELEVATE YOUR EDGE</div>
+        <h1>Learn Skills That<br><span class="gold">Shape</span> Your <span class="sky">Future</span></h1>
+        <p>Expert-curated courses designed to take you from beginner to professional. Start your journey today.</p>
+        <div class="hero-btns">
+            <a href="/courses" class="btn-gold">Explore Courses</a>
+            <a href="/my-courses" class="btn-ghost">My Dashboard</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><div class="stat-num">120+</div><div class="stat-lbl">COURSES</div></div>
+            <div class="stat"><div class="stat-num">50K+</div><div class="stat-lbl">LEARNERS</div></div>
+            <div class="stat"><div class="stat-num">95%</div><div class="stat-lbl">SUCCESS RATE</div></div>
+            <div class="stat"><div class="stat-num">4.9★</div><div class="stat-lbl">RATING</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURED COURSES -->
+<div class="section">
+    <div class="sec-head">
+        <div class="sec-pill">FEATURED COURSES</div>
+        <h2>Handpicked for <span>Your Growth</span></h2>
+        <p>Learn from industry experts and build real-world skills</p>
+    </div>
+    <div class="cards-grid">
+        <div class="course-card">
+            <div class="card-banner banner-navy">
+                <div class="card-icon">💻</div>
+                <div class="card-badge">TRENDING</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-navy">DEVELOPMENT</div>
+                <h3>Full Stack Java</h3>
+                <p>Master Java, Spring Boot and build production-ready web applications from scratch.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 12 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Full Stack Java', '12 weeks', '💻')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+        <div class="course-card">
+            <div class="card-banner banner-amber">
+                <div class="card-icon">📊</div>
+                <div class="card-badge">FEATURED</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-amber">DATA SCIENCE</div>
+                <h3>Data Science Pro</h3>
+                <p>Python, machine learning and data visualization for all skill levels.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 10 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Data Science Pro', '10 weeks', '📊')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+        <div class="course-card">
+            <div class="card-banner banner-teal">
+                <div class="card-icon">🎨</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-green">UI/UX DESIGN</div>
+                <h3>UI/UX Mastery</h3>
+                <p>Create stunning interfaces with Figma and modern design principles.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 8 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('UI/UX Mastery', '8 weeks', '🎨')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+        <!-- DYNAMICALLY ADDED COURSES FROM ADMIN -->
+        <div id="dynamic-courses-home" style="display:contents;"></div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-left">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="footer-brand-name">SKILLO <span>LEARN</span></div>
+    </div>
+    <div class="footer-mid">© 2026 Skillo Learn. All rights reserved.</div>
+    <div class="footer-right">Elevate Your Edge</div>
+</footer>
+
+<script th:src="@{/app.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        updateNavbar();
+        loadDynamicCoursesHome();
+    });
+
+    const bannerColors = ['banner-navy','banner-amber','banner-teal','banner-rose','banner-sky','banner-purple'];
+    const catColors = {
+        'DEVELOPMENT': 'cat-navy',
+        'DATA SCIENCE': 'cat-amber',
+        'UI/UX DESIGN': 'cat-green',
+        'SECURITY': 'cat-rose',
+        'MOBILE': 'cat-sky',
+        'CLOUD': 'cat-green',
+    };
+
+    function loadDynamicCoursesHome() {
+        const adminCourses = JSON.parse(localStorage.getItem('adminCourses')) || [];
+        const staticNames = ['Full Stack Java','Data Science Pro','UI/UX Mastery','Cyber Security Basics','Android Development'];
+        const newCourses = adminCourses.filter(c => !staticNames.includes(c.title));
+        const container = document.getElementById('dynamic-courses-home');
+        if (!container) return;
+        container.innerHTML = newCourses.map((c, i) => {
+            const banner = bannerColors[i % bannerColors.length];
+            const catClass = catColors[c.category] || 'cat-navy';
+            return `
+            <div class="course-card">
+                <div class="card-banner ${banner}">
+                    <div class="card-icon">${c.icon}</div>
+                </div>
+                <div class="card-body">
+                    <div class="cat-tag ${catClass}">${c.category}</div>
+                    <h3>${c.title}</h3>
+                    <p>${c.desc}</p>
+                    <div class="card-foot">
+                        <div class="dur">⏱ ${c.duration}</div>
+                        <button class="enroll-btn" onclick="enrollCourse('${c.title}','${c.duration}','${c.icon}')">Enroll Now</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+</script>
+
+</body>
+</html>

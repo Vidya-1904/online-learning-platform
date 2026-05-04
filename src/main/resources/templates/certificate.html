@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate - Skillo Learn</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .cert-page { background: #1a2a4a; min-height: 100vh; padding: 40px 20px; }
+        .cert-wrap { max-width: 960px; margin: 0 auto; }
+        .cert-page-head { text-align: center; margin-bottom: 36px; }
+        .cert-page-head h2 { font-size: 28px; font-weight: 800; color: white; }
+        .cert-page-head h2 span { color: #f5a623; }
+        .cert-page-head p { color: rgba(255,255,255,0.45); margin-top: 6px; font-size: 14px; }
+
+        .no-cert { text-align: center; padding: 60px 20px; }
+        .no-cert h3 { color: white; font-size: 22px; margin-bottom: 10px; }
+        .no-cert p { color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+
+        /* CERTIFICATE */
+        .cert-outer {
+            width: 100%;
+            background: linear-gradient(150deg, #fdfcf9 0%, #faf7f0 50%, #f5f0e8 100%);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.55);
+            margin-bottom: 28px;
+        }
+        .stripe-top, .stripe-bottom {
+            height: 6px;
+            background: linear-gradient(90deg, #0d1b35 0%, #2d6fd4 30%, #f5a623 50%, #2d6fd4 70%, #0d1b35 100%);
+        }
+        .cert-frame {
+            margin: 14px;
+            border: 1px solid rgba(196,168,130,0.35);
+            position: relative;
+        }
+        .cm { position: absolute; width: 22px; height: 22px; }
+        .cm-tl { top: -1px; left: -1px; border-top: 2px solid #c4a040; border-left: 2px solid #c4a040; }
+        .cm-tr { top: -1px; right: -1px; border-top: 2px solid #c4a040; border-right: 2px solid #c4a040; }
+        .cm-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #c4a040; border-left: 2px solid #c4a040; }
+        .cm-br { bottom: -1px; right: -1px; border-bottom: 2px solid #c4a040; border-right: 2px solid #c4a040; }
+
+        .cert-layout {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            min-height: 420px;
+        }
+
+        .cert-left {
+            background: linear-gradient(180deg, #0d1b35 0%, #152847 50%, #0d1b35 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 36px 18px;
+            position: relative;
+        }
+        .cert-left::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent 0%, #f5a623 25%, #2d6fd4 50%, #f5a623 75%, transparent 100%);
+        }
+        .logo-circle {
+            width: 88px; height: 88px;
+            background: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px;
+            box-shadow: 0 0 0 2px rgba(245,166,35,0.3), 0 6px 24px rgba(0,0,0,0.3);
+            margin-bottom: 18px;
+        }
+        .logo-circle img { width: 100%; height: 100%; object-fit: contain; }
+        .left-brand { color: white; font-size: 11px; font-weight: 900; letter-spacing: 2.5px; text-align: center; font-family: 'Segoe UI', sans-serif; }
+        .left-brand span { color: #f5a623; display: block; }
+        .left-tagline { color: rgba(255,255,255,0.3); font-size: 7px; letter-spacing: 2px; text-align: center; font-family: 'Segoe UI', sans-serif; margin-top: 5px; text-transform: uppercase; }
+        .left-rule { width: 36px; height: 1px; background: linear-gradient(90deg, transparent, #f5a623, transparent); margin: 20px auto; }
+        .left-seal {
+            width: 70px; height: 70px;
+            border: 1.5px solid rgba(245,166,35,0.5);
+            border-radius: 50%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: 0 0 0 4px rgba(245,166,35,0.08);
+            gap: 1px;
+        }
+        .seal-star { color: #f5a623; font-size: 18px; line-height: 1; }
+        .seal-label { color: #f5a623; font-size: 6.5px; font-weight: 900; letter-spacing: 1.5px; font-family: 'Segoe UI', sans-serif; }
+        .seal-sub { color: rgba(255,255,255,0.4); font-size: 6px; letter-spacing: 1px; font-family: 'Segoe UI', sans-serif; }
+
+        .cert-right {
+            padding: 40px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            font-family: 'Georgia', serif;
+        }
+        .cert-right::before {
+            content: 'SL';
+            position: absolute;
+            bottom: 20px; right: 30px;
+            font-size: 160px;
+            font-weight: 900;
+            color: rgba(13,27,53,0.035);
+            font-family: 'Georgia', serif;
+            pointer-events: none;
+            line-height: 1;
+        }
+        .cert-right-inner { position: relative; z-index: 1; }
+        .cert-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; }
+        .cert-presents { font-size: 8px; letter-spacing: 4px; color: #b0a080; text-transform: uppercase; font-family: 'Segoe UI', sans-serif; margin-bottom: 5px; }
+        .cert-heading { font-size: 28px; font-weight: 400; color: #0d1b35; letter-spacing: 1.5px; font-family: 'Georgia', serif; line-height: 1.2; }
+        .cert-heading-accent { width: 56px; height: 2px; background: linear-gradient(90deg, #f5a623, #2d6fd4); margin-top: 8px; border-radius: 1px; }
+        .cert-id-box { text-align: right; }
+        .cert-id-num { font-size: 10px; color: #c0b0a0; font-family: monospace; }
+        .cert-id-lbl { font-size: 8px; color: #d0c0b0; margin-top: 2px; font-family: 'Segoe UI', sans-serif; }
+
+        .rule { display: flex; align-items: center; gap: 8px; margin: 14px 0; }
+        .rl { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(196,160,64,0.6), rgba(196,160,64,0.1)); }
+        .rd { width: 5px; height: 5px; background: #c4a040; transform: rotate(45deg); flex-shrink: 0; }
+        .rl2 { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(196,160,64,0.1), rgba(196,160,64,0.6)); }
+
+        .cert-to { font-size: 12px; color: #9a8878; font-style: italic; margin-bottom: 6px; }
+        .cert-name { font-size: 52px; font-weight: 400; color: #0d1b35; font-family: 'Georgia', serif; font-style: italic; line-height: 1; margin-bottom: 6px; letter-spacing: 1px; }
+        .cert-name-rule { width: 140px; height: 2px; background: linear-gradient(90deg, #f5a623, #2d6fd4); border-radius: 1px; margin-bottom: 18px; }
+        .cert-for { font-size: 12px; color: #9a8878; font-style: italic; margin-bottom: 6px; }
+        .cert-course-name { font-size: 22px; font-weight: 700; color: #0d1b35; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .cert-course-detail { font-size: 11px; color: #b0a090; font-family: 'Segoe UI', sans-serif; }
+
+        .cert-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 18px;
+            border-top: 1px solid rgba(196,168,130,0.2);
+            margin-top: 22px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .cert-pill { background: #0d1b35; color: white; font-size: 9px; font-weight: 700; padding: 7px 18px; border-radius: 20px; font-family: 'Segoe UI', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+        .cert-date-block { text-align: center; }
+        .cert-date-lbl { font-size: 8px; color: #b0a090; letter-spacing: 2px; font-family: 'Segoe UI', sans-serif; text-transform: uppercase; }
+        .cert-date-val { font-size: 14px; font-weight: 700; color: #0d1b35; font-family: 'Segoe UI', sans-serif; margin-top: 3px; }
+        .cert-pill-gold { background: transparent; border: 1.5px solid #c4a040; color: #7a6020; font-size: 9px; font-weight: 700; padding: 7px 18px; border-radius: 20px; font-family: 'Segoe UI', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        .cert-actions { display: flex; gap: 14px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+        .btn-print-cert { background: #f5a623; color: #0d1b35; border: none; padding: 12px 28px; border-radius: 24px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Segoe UI', sans-serif; }
+        .btn-back-cert { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.3); padding: 12px 28px; border-radius: 24px; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block; font-family: 'Segoe UI', sans-serif; }
+
+        @media print {
+            .navbar, footer, .cert-actions, .cert-page-head { display: none !important; }
+            .cert-page { background: white !important; padding: 0 !important; }
+            .cert-outer { box-shadow: none; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+        }
+        
+        @media(max-width: 700px) {
+            .cert-layout { grid-template-columns: 1fr; }
+            .cert-left { flex-direction: row; gap: 16px; padding: 20px; justify-content: center; }
+            .cert-left::after { display: none; }
+            .cert-right { padding: 24px 20px; }
+            .cert-name { font-size: 34px; }
+            .cert-heading { font-size: 20px; }
+            .cert-bottom { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="brand">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="brand-text">
+            <div class="brand-name">SKILLO <span>LEARN</span></div>
+            <span class="brand-tag">ELEVATE YOUR EDGE</span>
+        </div>
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/courses">Courses</a>
+        <a href="/my-courses">My Courses</a>
+        <a href="/certificate">Certificates</a>
+        <a href="/admin">Admin</a>
+    </div>
+    <a href="/login" class="nav-cta">Get Started</a>
+</nav>
+
+<div class="cert-page">
+    <div class="cert-wrap">
+
+        <div class="cert-page-head">
+            <div class="sec-pill">ACHIEVEMENTS</div>
+            <h2>Your <span>Certificates</span></h2>
+            <p>Awarded for 100% course completion</p>
+        </div>
+
+        <div id="cert-list"></div>
+
+        <div id="no-cert" class="no-cert" style="display:none;">
+            <div style="font-size:60px; margin-bottom:16px;">🏆</div>
+            <h3>No Certificates Yet</h3>
+            <p>Complete a course 100% to earn your certificate!</p>
+            <a href="/courses" class="btn-gold" style="text-decoration:none;">Browse Courses</a>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-left">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="footer-brand-name">SKILLO <span>LEARN</span></div>
+    </div>
+    <div class="footer-mid">© 2026 Skillo Learn. All rights reserved.</div>
+    <div class="footer-right">Elevate Your Edge</div>
+</footer>
+
+<script th:src="@{/app.js}"></script>
+
+<script>
+    function generateCertId() {
+        return 'SL-' + new Date().getFullYear() + '-' + Math.floor(10000 + Math.random() * 90000);
+    }
+
+    function loadCertificates() {
+        if (!localStorage.getItem('skilloLoggedIn')) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const list = document.getElementById('cert-list');
+        const noCert = document.getElementById('no-cert');
+        const user = JSON.parse(localStorage.getItem('skilloLoggedIn')) || { name: 'Learner' };
+
+        // Uses getEnrolledCourses() from app.js — reads per-user key
+        const courses = getEnrolledCourses();
+        const completed = courses.filter(c => c.progress === 100);
+
+        updateNavbar();
+
+        if (completed.length === 0) {
+            noCert.style.display = 'block';
+            return;
+        }
+
+        const today = new Date().toLocaleDateString('en-IN', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        list.innerHTML = completed.map(course => `
+        <div class="cert-outer">
+            <div class="stripe-top"></div>
+            <div class="cert-frame">
+                <div class="cm cm-tl"></div>
+                <div class="cm cm-tr"></div>
+                <div class="cm cm-bl"></div>
+                <div class="cm cm-br"></div>
+                <div class="cert-layout">
+
+                    <div class="cert-left">
+                        <div class="logo-circle">
+                            <img src="/logoSL.png" alt="Skillo Learn" onerror="this.style.display='none'">
+                        </div>
+                        <div class="left-brand">SKILLO <span>LEARN</span></div>
+                        <div class="left-tagline">Elevate Your Edge</div>
+                        <div class="left-rule"></div>
+                        <div class="left-seal">
+                            <div class="seal-star">★</div>
+                            <div class="seal-label">VERIFIED</div>
+                            <div class="seal-sub">CERTIFIED</div>
+                        </div>
+                    </div>
+
+                    <div class="cert-right">
+                        <div class="cert-right-inner">
+
+                            <div class="cert-top-row">
+                                <div>
+                                    <div class="cert-presents">Proudly Presents</div>
+                                    <div class="cert-heading">Certificate of<br>Completion</div>
+                                    <div class="cert-heading-accent"></div>
+                                </div>
+                                <div class="cert-id-box">
+                                    <div class="cert-id-num">${generateCertId()}</div>
+                                    <div class="cert-id-lbl">Certificate ID</div>
+                                </div>
+                            </div>
+
+                            <div class="rule"><div class="rl"></div><div class="rd"></div><div class="rl2"></div></div>
+
+                            <div class="cert-to">This certificate is proudly presented to</div>
+                            <div class="cert-name">${user.name}</div>
+                            <div class="cert-name-rule"></div>
+
+                            <div class="cert-for">for successfully completing the course</div>
+                            <div class="cert-course-name">${course.name}</div>
+                            <div class="cert-course-detail">with full completion of all ${course.total} lessons &nbsp;·&nbsp; Duration: ${course.duration}</div>
+
+                            <div class="cert-bottom">
+                                <div class="cert-pill">Skillo Learn Certified</div>
+                                <div class="cert-date-block">
+                                    <div class="cert-date-lbl">Date of Issue</div>
+                                    <div class="cert-date-val">${today}</div>
+                                </div>
+                                <div class="cert-pill-gold">Verified Completion</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="stripe-bottom"></div>
+        </div>
+
+        <div class="cert-actions">
+            <button class="btn-print-cert" onclick="window.print()">Print Certificate</button>
+            <a href="/my-courses" class="btn-back-cert">← My Courses</a>
+        </div>
+    `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCertificates);
+</script>
+</body>
+</html>

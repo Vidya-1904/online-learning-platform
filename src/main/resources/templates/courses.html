@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Courses - Skillo Learn</title>
+    <!-- Ensure this link is correct to load your colors -->
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="brand">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="brand-text">
+            <div class="brand-name">SKILLO <span>LEARN</span></div>
+        </div>
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/courses">Courses</a>
+        <a href="/my-courses">My Courses</a>
+        <a href="/certificate">Certificates</a>
+    </div>
+    <a href="/login" class="nav-cta">Get Started</a>
+</nav>
+
+<div class="page-hero" style="text-align:center; padding:50px; background:#0d1b35; color:white;">
+    <h1>All <span>Courses</span></h1>
+    <p>Explore our library of expert-led courses</p>
+</div>
+
+<div class="section" style="padding:40px; background:#f4f7f9;">
+    <div class="cards-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:25px; max-width:1200px; margin:0 auto;">
+        
+        <!-- Full Stack Java -->
+        <div class="course-card">
+            <div class="card-banner banner-navy">
+                <div class="card-icon">💻</div>
+                <div class="card-badge">TRENDING</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-navy">DEVELOPMENT</div>
+                <h3>Full Stack Java</h3>
+                <p>Master Java, Spring Boot and build production-ready web applications.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 12 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Full Stack Java','12 weeks','💻')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Science Pro -->
+        <div class="course-card">
+            <div class="card-banner banner-amber">
+                <div class="card-icon">📊</div>
+                <div class="card-badge">FEATURED</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-amber">DATA SCIENCE</div>
+                <h3>Data Science Pro</h3>
+                <p>Python, machine learning and data visualization for all skill levels.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 10 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Data Science Pro','10 weeks','📊')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI/UX Mastery -->
+        <div class="course-card">
+            <div class="card-banner banner-teal">
+                <div class="card-icon">🎨</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-green">UI/UX DESIGN</div>
+                <h3>UI/UX Mastery</h3>
+                <p>Create stunning interfaces with Figma and modern design principles.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 8 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('UI/UX Mastery','8 weeks','🎨')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cyber Security Basics -->
+        <div class="course-card">
+            <div class="card-banner banner-rose">
+                <div class="card-icon">🔐</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-rose">SECURITY</div>
+                <h3>Cyber Security Basics</h3>
+                <p>Understand threats, vulnerabilities and protect digital systems.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 7 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Cyber Security Basics','7 weeks','🔐')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Android Development -->
+        <div class="course-card">
+            <div class="card-banner banner-sky">
+                <div class="card-icon">📱</div>
+            </div>
+            <div class="card-body">
+                <div class="cat-tag cat-sky">MOBILE</div>
+                <h3>Android Development</h3>
+                <p>Build modern Android apps using Kotlin and Android Studio.</p>
+                <div class="card-foot">
+                    <div class="dur">⏱ 11 weeks</div>
+                    <button class="enroll-btn" onclick="enrollCourse('Android Development','11 weeks','📱')">Enroll Now</button>
+                </div>
+            </div>
+        </div>
+            <!-- DYNAMICALLY ADDED COURSES FROM ADMIN -->
+        <div id="dynamic-courses" style="display:contents;"></div>
+        
+    </div>
+</div>
+
+
+<script th:src="@{/app.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        updateNavbar();
+        loadDynamicCourses();
+    });
+
+    const bannerColors = ['banner-navy','banner-amber','banner-teal','banner-rose','banner-sky','banner-purple'];
+    const catColors = {
+        'DEVELOPMENT': 'cat-navy',
+        'DATA SCIENCE': 'cat-amber',
+        'UI/UX DESIGN': 'cat-green',
+        'SECURITY': 'cat-rose',
+        'MOBILE': 'cat-sky',
+        'CLOUD': 'cat-green',
+    };
+
+    function loadDynamicCourses() {
+        const adminCourses = JSON.parse(localStorage.getItem('adminCourses')) || [];
+        const staticNames = ['Full Stack Java','Data Science Pro','UI/UX Mastery','Cyber Security Basics','Android Development'];
+        const newCourses = adminCourses.filter(c => !staticNames.includes(c.title));
+        const container = document.getElementById('dynamic-courses');
+        if (!container) return;
+        container.innerHTML = newCourses.map((c, i) => {
+            const banner = bannerColors[i % bannerColors.length];
+            const catClass = catColors[c.category] || 'cat-navy';
+            const lessonsNum = parseInt(c.lessons) || 10;
+            return `
+            <div class="course-card">
+                <div class="card-banner ${banner}">
+                    <div class="card-icon">${c.icon}</div>
+                </div>
+                <div class="card-body">
+                    <div class="cat-tag ${catClass}">${c.category}</div>
+                    <h3>${c.title}</h3>
+                    <p>${c.desc}</p>
+                    <div class="card-foot">
+                        <div class="dur">⏱ ${c.duration}</div>
+                        <button class="enroll-btn" onclick="enrollCourse('${c.title}','${c.duration}','${c.icon}')">Enroll Now</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+</script>
+</body>
+</html>

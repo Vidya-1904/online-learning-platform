@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses - Skillo Learn</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <style>
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 900px; margin: 0 auto 32px; }
+        .stat-box { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--card-border); text-align: center; }
+        .stat-box .num { font-size: 30px; font-weight: 800; color: var(--gold); }
+        .stat-box .lbl { font-size: 12px; color: var(--gray); margin-top: 4px; letter-spacing: 0.5px; }
+        #enrolled-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        @media(max-width:768px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="brand">
+        <img th:src="@{/logoSL.png}" alt="Skillo Learn">
+        <div class="brand-text">
+            <div class="brand-name">SKILLO <span>LEARN</span></div>
+            <span class="brand-tag">ELEVATE YOUR EDGE</span>
+        </div>
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/courses">Courses</a>
+        <a href="/my-courses">My Courses</a>
+        <a href="/certificate">🏆 Certificates</a>
+        <a href="/admin">Admin</a>
+    </div>
+    <a href="/login" class="nav-cta">Get Started</a>
+</nav>
+
+<div class="page-hero">
+    <h1>My <span>Learning Dashboard</span></h1>
+    <p>Track your progress and continue your learning journey</p>
+</div>
+
+<div class="section white">
+    <div class="dash-wrap">
+
+        <div class="stats-row">
+            <div class="stat-box"><div class="num" id="stat-enrolled">0</div><div class="lbl">Enrolled</div></div>
+            <div class="stat-box"><div class="num" id="stat-completed">0</div><div class="lbl">Completed</div></div>
+            <div class="stat-box"><div class="num" id="stat-progress">0%</div><div class="lbl">Avg Progress</div></div>
+            <div class="stat-box"><div class="num" id="stat-certs">0</div><div class="lbl">Certificates</div></div>
+        </div>
+
+        <div class="dash-header">
+            <h2>Enrolled <span>Courses</span></h2>
+            <div class="dash-badge" id="enrolled-count">0 Courses</div>
+        </div>
+
+        <div id="enrolled-list"></div>
+
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div style="font-size:56px; margin-bottom:16px;">📚</div>
+            <h3>No Courses Enrolled Yet</h3>
+            <p style="margin-bottom:24px; color:var(--gray);">Explore our courses and start your learning journey today!</p>
+            <a href="/courses" class="btn-gold">Browse Courses</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-mid">© 2026 Skillo Learn. All rights reserved.</div>
+</footer>
+
+<script th:src="@{/app.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        updateNavbar();
+
+        if (!localStorage.getItem('skilloLoggedIn')) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // uses getEnrolledCourses() from app.js — reads per-user key
+        const courses = getEnrolledCourses();
+        const listContainer = document.getElementById('enrolled-list');
+        const emptyState = document.getElementById('empty-state');
+        const countBadge = document.getElementById('enrolled-count');
+
+        const completed = courses.filter(c => c.progress === 100).length;
+        const avgProgress = courses.length ? Math.round(courses.reduce((a, c) => a + c.progress, 0) / courses.length) : 0;
+
+        document.getElementById('stat-enrolled').textContent = courses.length;
+        document.getElementById('stat-completed').textContent = completed;
+        document.getElementById('stat-progress').textContent = avgProgress + '%';
+        document.getElementById('stat-certs').textContent = completed;
+        if (countBadge) countBadge.textContent = courses.length + " Courses";
+
+        if (courses.length === 0) {
+            emptyState.style.display = 'block';
+            listContainer.innerHTML = '';
+        } else {
+            emptyState.style.display = 'none';
+            listContainer.innerHTML = courses.map(course => `
+                <div class="course-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #eee;">
+                    <div class="card-icon" style="font-size: 40px; margin-bottom: 10px;">${course.icon}</div>
+                    <h3>${course.name}</h3>
+                    <p style="font-size: 13px; color: gray; margin-bottom: 10px;">${course.duration}</p>
+                    <div class="prog-bar-bg" style="background: #eee; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px;">
+                        <div style="background: var(--gold); height: 100%; width: ${course.progress}%"></div>
+                    </div>
+                    <button onclick="goToCourse('${course.name.replace(/'/g, "\\'")}')" class="btn-gold" style="width: 100%; padding: 10px; border: none; cursor: pointer;">Continue →</button>
+                </div>
+            `).join('');
+        }
+    });
+
+    function goToCourse(name) {
+        // uses getEnrolledCourses() and setCurrentCourse() from app.js
+        const courses = getEnrolledCourses();
+        const selected = courses.find(c => c.name === name);
+        if (selected) {
+            setCurrentCourse(selected);
+            window.location.href = '/course-detail';
+        }
+    }
+</script>
+</body>
+</html>
